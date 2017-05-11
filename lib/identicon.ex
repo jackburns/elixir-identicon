@@ -40,15 +40,19 @@ defmodule Identicon do
     [first, second | _tail] = row
     row ++ [second, first]
   end
-  
+
   @doc """
   Build a grid from a hex list
   chunks into lists of 3 and then mirrors the first two elements
   """
   def build_grid(image) do
-    image.hex
-    |> Enum.chunk(3)
-    |> Enum.map(&mirror_row/1)
+    grid = image.hex
+      |> Enum.chunk(3)
+      |> Enum.map(&mirror_row/1)
+      |> List.flatten
+      |> Enum.filter(fn(x) -> rem(x, 2) == 0 end)
+      |> Enum.with_index
+    %Identicon.Image{image | grid: grid}
   end
 
 end
