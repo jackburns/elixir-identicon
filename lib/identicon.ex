@@ -1,16 +1,11 @@
 defmodule Identicon do
   @moduledoc """
-  Documentation for Identicon.
+  Deterministically generate a .png Identicon (like github's) from a string.
+  Use by calling Identicon.main("some string").
+
   """
-
   @doc """
-    Given a string deterministic create an identicon
-    pipes output through helpers until image is created
-  ## Examples
-
-      iex> Identicon.main
-      :world
-
+  Main function for generating an Identicon
   """
   def main(input) do
     input
@@ -38,6 +33,9 @@ defmodule Identicon do
     %Identicon.Image{image | color: {r, g, b}}
   end
 
+  @doc """
+  Helper to mirror a row
+  """
   def mirror_row(row) do
     [first, second | _tail] = row
     row ++ [second, first]
@@ -52,13 +50,13 @@ defmodule Identicon do
       |> Enum.chunk(3)
       |> Enum.map(&mirror_row/1)
       |> List.flatten
-      |> Enum.filter(fn(x) -> rem(x, 2) == 0 end)
       |> Enum.with_index
+      |> Enum.filter(fn({code, _index}) -> rem(code, 2) == 0 end)
     %Identicon.Image{image | grid: grid}
   end
 
   @doc """
-  contruct image using erlangs egd lib using image grid and color
+  Contruct image using erlangs egd lib using image grid and color
   """
   def draw_image(image) do
     pixelmap = :egd.create(250, 250)
@@ -74,7 +72,7 @@ defmodule Identicon do
   end
 
   @doc """
-  saves image to filesystem as a png
+  Saves image to filesystem as a png
   """
   def save_image(image, filename) do
     File.write("#{filename}.png", image)
